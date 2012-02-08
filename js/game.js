@@ -22,7 +22,7 @@ KEY = {
 pingpong = {
 	fps: 60,
 	pressedKeys: [],
-	debug: true,
+	debug: false,
 	paused: false,
 	ball: {         
 		x: null,
@@ -91,8 +91,9 @@ pingpong = {
 		height: 10,
 		speed: 5,
 		color: "#FFFFFF",
-		dir: null,
 		active: false,
+		move: false,
+		dir: null,
 		obj: null,
 	},
 	render: {
@@ -222,7 +223,7 @@ if (render.notafication) {
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.2",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.2.1",ctx.canvas.width - 5,5);
 }
 }
 
@@ -366,12 +367,12 @@ if (powerup.x + powerup.width >= paddleB.x && powerup.x <= paddleB.x + paddleB.w
 //left edge
 if (powerup.x <= 0) {
 	render.powerup = false;
-	clearInterval(pingpong.movePowerup);
+	powerup.move = false;
 }
 //right edge
 if (powerup.x + powerup.width >= ctx.canvas.width) {
 	render.powerup = false;
-	clearInterval(pingpong.movePowerup);
+	powerup.move = false;
 }
 }
 
@@ -410,14 +411,10 @@ if (probability(1000) == 1 && !render.powerup && !powerup.active) {
 	}
 	powerup.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 8);
 	render.powerup = true;
-	pingpong.movePowerup = setInterval(function() {
-		powerup.x += powerup.speed * powerup.dir;
-	},1000/pingpong.fps);
-	setTimeout(function() {
-		if (render.powerup) {
-			render.powerup = false;
-		}
-	},1000*20);
+	powerup.move = true;
+}
+if (powerup.move) {
+	powerup.x += powerup.speed * powerup.dir;
 }
 }
 
@@ -451,8 +448,8 @@ else {
 }
 
 function increaseBallSpeed() {
-//get the probability of 1 in 3 and increase ball speed
-if (probability(5) == 1) {
+//get the probability of 1 in 4 and increase ball speed
+if (probability(4) == 1) {
 	ball.speedModifier++;
 	notafication("Speed Increased!",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF",3,750);
 }
