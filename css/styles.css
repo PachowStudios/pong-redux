@@ -1,0 +1,21 @@
+body, html {
+padding: 0px;
+margin: 0px;
+overflow: hidden;
+}
+
+#canvas {
+position: absolute;
+z-index: 1;
+background-color: #000;
+}
+
+#overlay {
+position: absolute;
+z-index: 2;
+}
+
+@font-face {
+font-family: pong;
+src: url('pong.ttf');
+}
