@@ -446,7 +446,7 @@ if (complete.value == true) {
 }
 
 function calculatePowerups() {
-if (probability(1000) == 1 && !render.powerup && !powerup.active && !pingpong.respawing) {
+if (probability(1000) == 1 && !render.powerup && !powerup.active && !pingpong.respawning) {
 	if (probability(2) == 1) {
 		//go left
 		powerup.dir = -1;
