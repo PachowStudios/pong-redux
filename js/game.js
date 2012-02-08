@@ -24,6 +24,7 @@ pingpong = {
 	pressedKeys: [],
 	debug: false,
 	paused: false,
+	respawing: false,
 	ball: {         
 		x: null,
 		y: null,
@@ -41,11 +42,12 @@ pingpong = {
 		width: 10,
 		height: 80,
 		heightModifier: 0,
-		speed: 12,
+		speed: 8,
 		speedModifier: 0,
 		color: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
+		AI: false,
 	},
 	paddleB: {
 		x: null,
@@ -53,11 +55,12 @@ pingpong = {
 		width: 10,
 		height: 80,
 		heightModifier: 0,
-		speed: 12,
+		speed: 8,
 		speedModifier: 0,
 		color: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
+		AI: false,
 	},
 	scoreA: {
 		value: 0,
@@ -83,6 +86,9 @@ pingpong = {
 		x: null,
 		y: null,
 		color: "#FFFFFF",
+		font: "60px pong",
+		align: "center",
+		baseline: "top",
 	},
 	powerup: {
 		x: null,
@@ -157,6 +163,7 @@ pingpong.gameloop = setInterval(gameloop,1000/pingpong.fps);
 
 function gameloop() {
 checkInput();
+calculateAI();
 moveBall();
 checkCollision();
 checkComplete();
@@ -213,17 +220,19 @@ if (render.paused) {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillText("Paused",ctx.canvas.width / 2,20);
 }
-ctx.font = "60px pong";
-//draw notafication
-if (render.notafication) {
-	ctx.fillStyle = notafication.color;
-	ctx.fillText(notafication.text,notafication.x,notafication.y);
-}
 //draw version number
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.2.1",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.3",ctx.canvas.width - 5,5);
+}
+//draw notafication
+if (render.notafication) {
+	ctx.font = notafication.font;
+	ctx.textAlign = notafication.align;
+	ctx.textBaseline = notafication.baseline;
+	ctx.fillStyle = notafication.color;
+	ctx.fillText(notafication.text,notafication.x,notafication.y);
 }
 }
 
@@ -291,6 +300,45 @@ for (var keyCode in KEY) {
 }
 }
 
+function calculateAI() {
+if (paddleA.AI) {
+	if (ball.x + (ball.width / 2) <= ctx.canvas.width * 0.4) {
+		if (ball.y + (ball.height / 2) >= paddleA.y + (paddleA.height / 2) && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height) {
+			paddleA.y += paddleA.speed + paddleA.speedModifier;
+		}
+		else if (paddleA.y > 0) {
+			paddleA.y -= paddleA.speed + paddleA.speedModifier;
+		}
+	}
+	else {
+		if (paddleA.y + (paddleA.height / 2) <= (ctx.canvas.height / 2) - 50 && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height) {
+			paddleA.y += paddleA.speed + paddleA.speedModifier;
+		}
+		else if (paddleA.y + (paddleA.height / 2) >= (ctx.canvas.height / 2) + 50 && paddleA.y > 0) {
+			paddleA.y -= paddleA.speed + paddleA.speedModifier;
+		}
+	}
+}
+if (paddleB.AI) {
+	if (ball.x + (ball.width / 2) >= ctx.canvas.width * 0.6) {
+		if (ball.y + (ball.height / 2) >= paddleB.y + (paddleB.height / 2) && paddleB.y + paddleB.height + paddleB.heightModifier < ctx.canvas.height) {
+			paddleB.y += paddleB.speed + paddleB.speedModifier;
+		}
+		else if (paddleB.y > 0) {
+			paddleB.y -= paddleB.speed + paddleB.speedModifier;
+		}
+	}
+	else {
+		if (paddleB.y + (paddleB.height / 2) <= (ctx.canvas.height / 2) - 50 && paddleB.y + paddleB.height + paddleB.heightModifier < ctx.canvas.height) {
+			paddleB.y += paddleB.speed + paddleB.speedModifier;
+		}
+		else if (paddleB.y + (paddleB.height / 2) >= (ctx.canvas.height / 2) + 50 && paddleB.y > 0) {
+			paddleB.y -= paddleB.speed + paddleB.speedModifier;
+		}
+	}
+}
+}
+
 function moveBall() {
 //check top edge
 if (ball.y < 0) {
@@ -299,18 +347,6 @@ if (ball.y < 0) {
 //check bottom edge
 if (ball.y + 20 > ctx.canvas.height) {
 	ball.directionY = -1;
-}
-//check right edge
-if (ball.x > ctx.canvas.width) {
-	//player B lost, reset ball
-	scoreA.value++;
-	respawnBall();
-}
-//check left edge
-if (ball.x < -20) {
-	//player A lost, reset ball
-	scoreB.value++;
-	respawnBall();
 }
 //actualy move the ball
 ball.x += (ball.speed + ball.speedModifier) * ball.directionX;
@@ -344,6 +380,18 @@ if (ball.x + ball.width >= paddleB.x && ball.x <= paddleB.x + paddleB.width) {
 		}
 		increaseBallSpeed();
 	}
+}
+//left edge
+if (ball.x < -20) {
+	//player A lost, reset ball
+	scoreB.value++;
+	respawnBall();
+}
+//right edge
+if (ball.x > ctx.canvas.width) {
+	//player B lost, reset ball
+	scoreA.value++;
+	respawnBall();
 }
 //powerup
 //left paddle
@@ -398,7 +446,7 @@ if (complete.value == true) {
 }
 
 function calculatePowerups() {
-if (probability(1000) == 1 && !render.powerup && !powerup.active) {
+if (probability(1000) == 1 && !render.powerup && !powerup.active && !pingpong.respawing) {
 	if (probability(2) == 1) {
 		//go left
 		powerup.dir = -1;
@@ -428,9 +476,12 @@ return Math.floor(Math.random()*max);
 }
  
 function respawnBall() {
+pingpong.respawing = true;
 //reset ball coords
 ball.x = (ctx.canvas.width / 2) - (ball.width / 2);
 ball.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 4);
+var dspeed = ball.speed;
+ball.speed = 0;
 ball.speedModifier = 0;
 //randomize ball direction
 if (probability(2) == 0) {
@@ -445,22 +496,37 @@ if (probability(2) == 0) {
 else {
 	ball.directionY = -1;
 }
+notafication("3",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+setTimeout(function() {
+	notafication("2",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+},500);
+setTimeout(function() {
+	notafication("1",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+},1000);
+setTimeout(function() {
+	notafication("GO",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+	ball.speed = dspeed;
+	pingpong.respawning = false;
+},1500);
 }
 
 function increaseBallSpeed() {
 //get the probability of 1 in 4 and increase ball speed
 if (probability(4) == 1) {
 	ball.speedModifier++;
-	notafication("Speed Increased!",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF",3,750);
+	notafication("Speed Increased!",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",3,750);
 }
 }
 
-function notafication(text,x,y,color,count,interval) {
+function notafication(text,x,y,color,font,align,baseline,count,interval) {
 //apply passed vars to global vars
 notafication.text = text;
 notafication.x = x;
 notafication.y = y;
 notafication.color = color;
+notafication.font = font;
+notafication.align = align;
+notafication.baseline = baseline;
 //enable notafication rendering
 render.notafication = true;
 //toggle notafication x times
@@ -521,14 +587,26 @@ else {
 /************/
 
 function applyPowerup() {
-switch(probability(2)) {
+switch(probability(4)) {
+	//expand powerup
 	case 0:
 		powerup.active = true;
 		expand(powerup.obj,2,40,10);
 		break;
+	//shrink powerdown
 	case 1:
 		powerup.active = true;
 		shrink(powerup.obj,2,-40,10);
+		break;
+	//speed powerup
+	case 2:
+		powerup.active = true;
+		paddleSpeed(powerup.obj,8,10);
+		break;
+	//speed powerdown
+	case 3:
+		powerup.active = true;
+		paddleSpeed(powerup.obj,-4,10);
 		break;
 }
 }
@@ -536,6 +614,12 @@ switch(probability(2)) {
 function expand(paddle,inc,amt,time) {
 //animate expansion if not active
 if (!paddle.expanded) {
+	if (paddle.x <= ctx.canvas.width / 2) {
+		notafication("Paddle Expand!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+	}
+	else {
+		notafication("Paddle Expand!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+	}
 	//get current height modifier for reference
 	var origM = paddle.heightModifier;
 	paddle.expanded = true;
@@ -548,7 +632,7 @@ if (!paddle.expanded) {
 	},1000/pingpong.fps);
 	//return to normal size after set time
 	setTimeout(function() {
-		//update current height modifier in case it may have changed due to multiple powerups
+		//update current height modifier in case it changed due to multiple powerups
 		var newM = paddle.heightModifier;
 		paddle.expand_shrinkloop = setInterval(function() {
 			paddle.heightModifier -= inc;
@@ -556,9 +640,9 @@ if (!paddle.expanded) {
 			if (paddle.heightModifier <= newM - amt) {
 				clearInterval(paddle.expand_shrinkloop);
 				paddle.expanded = false;
+				powerup.active = false;
 			}
 		},1000/pingpong.fps);
-		powerup.active = false;
 	},1000*time);
 }
 //end if powerup is already active
@@ -570,6 +654,12 @@ else if (paddle.expanded) {
 function shrink(paddle,inc,amt,time) {
 //animate shrinkage if not active
 if (!paddle.shrunk) {
+	if (paddle.x <= ctx.canvas.width / 2) {
+		notafication("Paddle Shrink!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+	}
+	else {
+		notafication("Paddle Shrink!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+	}
 	//get current height modifier for reference
 	var origM = paddle.heightModifier;
 	paddle.shrunk = true;
@@ -582,7 +672,7 @@ if (!paddle.shrunk) {
 	},1000/pingpong.fps);
 	//return to normal size after set time
 	setTimeout(function() {
-		//update current height modifier in case it may have changed due to multiple powerups
+		//update current height modifier in case it changed due to multiple powerups
 		var newM = paddle.heightModifier;
 		paddle.shrink_expandloop = setInterval(function() {
 			paddle.heightModifier += inc;
@@ -590,13 +680,44 @@ if (!paddle.shrunk) {
 			if (paddle.heightModifier >= newM - amt) {
 				clearInterval(paddle.shrink_expandloop);
 				paddle.shrunk = false;
+				powerup.active = false;
 			}
 		},1000/pingpong.fps);
-		powerup.active = false;
 	},1000*time);
 }
 //end if powerup is already active
 else if (paddle.shrunk) {
+	return
+}
+}
+
+function paddleSpeed(paddle,amt,time) {
+if (!paddle.speedpowerup) {
+	if (amt >= 0) {
+		if (paddle.x <= ctx.canvas.width / 2) {
+			notafication("Paddle Speedup!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+		}
+		else {
+			notafication("Paddle Speedup!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+		}
+	}
+	else {
+		if (paddle.x <= ctx.canvas.width / 2) {
+			notafication("Paddle Slowdown!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+		}
+		else {
+			notafication("Paddle Slowdown!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+		}
+	}
+	paddle.speedpowerup = true;
+	paddle.speedModifier += amt;
+	setTimeout(function() {
+		paddle.speedModifier -= amt;
+		paddle.speedpowerup = false;
+		powerup.active = false;
+	},1000*time);
+}
+else if (paddle.speedpowerup) {
 	return
 }
 }
