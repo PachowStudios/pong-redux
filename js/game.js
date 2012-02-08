@@ -22,7 +22,7 @@ KEY = {
 pingpong = {
 	fps: 60,
 	pressedKeys: [],
-	debug: false,
+	debug: true,
 	paused: false,
 	ball: {         
 		x: null,
@@ -84,10 +84,22 @@ pingpong = {
 		y: null,
 		color: "#FFFFFF",
 	},
+	powerup: {
+		x: null,
+		y: null,
+		width: 10,
+		height: 10,
+		speed: 5,
+		color: "#FFFFFF",
+		dir: null,
+		active: false,
+		obj: null,
+	},
 	render: {
 		scoreA: true,
 		scoreB: true,
 		notafication: false,
+		powerup: false,
 		complete: false,
 		paused: false,
 		version: true
@@ -100,6 +112,7 @@ paddleB = pingpong.paddleB;
 scoreA = pingpong.scoreA;
 scoreB = pingpong.scoreB;
 complete = pingpong.complete;
+powerup = pingpong.powerup
 render = pingpong.render;
 //adjust positioning according to window size
 paddleA.y = (ctx.canvas.height - paddleA.height) / 2;
@@ -146,6 +159,7 @@ checkInput();
 moveBall();
 checkCollision();
 checkComplete();
+calculatePowerups();
 renderGraphics();
 }
 
@@ -171,6 +185,11 @@ ctx.fillRect(paddleA.x,paddleA.y,paddleA.width,paddleA.height + paddleA.heightMo
 //draw paddleB
 ctx.fillStyle = paddleB.color;
 ctx.fillRect(paddleB.x,paddleB.y,paddleB.width,paddleB.height + paddleB.heightModifier);
+//draw powerup
+if (render.powerup) {
+	ctx.fillStyle = powerup.color;
+	ctx.fillRect(powerup.x,powerup.y,powerup.width,powerup.height);
+}
 //draw scores
 ctx.font = "120px pong";
 ctx.textAlign = "center";
@@ -203,7 +222,7 @@ if (render.notafication) {
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.1",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.2",ctx.canvas.width - 5,5);
 }
 }
 
@@ -298,6 +317,7 @@ ball.y += (ball.speed + ball.speedModifier) * ball.directionY;
 }
 
 function checkCollision() {
+//ball
 //left paddle
 if (ball.x <= paddleA.x + paddleA.width && ball.x + ball.width >= paddleA.x) {
 	if (ball.y <= paddleA.y + paddleA.height + paddleA.heightModifier && ball.y + ball.height >= paddleA.y) {
@@ -324,6 +344,35 @@ if (ball.x + ball.width >= paddleB.x && ball.x <= paddleB.x + paddleB.width) {
 		increaseBallSpeed();
 	}
 }
+//powerup
+//left paddle
+if (powerup.x <= paddleA.x + paddleA.width && powerup.x + powerup.width >= paddleA.x && render.powerup) {
+	if (powerup.y + powerup.height >= paddleA.y && powerup.y <= paddleA.y + paddleA.height) {
+		render.powerup = false;
+		clearInterval(pingpong.movePowerup);
+		powerup.obj = paddleA;
+		applyPowerup();
+	}
+}
+//right paddle
+if (powerup.x + powerup.width >= paddleB.x && powerup.x <= paddleB.x + paddleB.width && render.powerup) {
+	if (powerup.y + powerup.height >= paddleB.y && powerup.y <= paddleB.y + paddleB.height) {
+		render.powerup = false;
+		clearInterval(pingpong.movePowerup);
+		powerup.obj = paddleB;
+		applyPowerup();
+	}
+}
+//left edge
+if (powerup.x <= 0) {
+	render.powerup = false;
+	clearInterval(pingpong.movePowerup);
+}
+//right edge
+if (powerup.x + powerup.width >= ctx.canvas.width) {
+	render.powerup = false;
+	clearInterval(pingpong.movePowerup);
+}
 }
 
 function checkComplete() {
@@ -344,6 +393,31 @@ if (complete.value == true) {
 	render.complete = true;
 	clearInterval(pingpong.gameloop);
 	renderGraphics();
+}
+}
+
+function calculatePowerups() {
+if (probability(1000) == 1 && !render.powerup && !powerup.active) {
+	if (probability(2) == 1) {
+		//go left
+		powerup.dir = -1;
+		powerup.x = probability(ctx.canvas.width / 8) + (ctx.canvas.width * 0.25);
+	}
+	else {
+		//go right
+		powerup.dir = 1;
+		powerup.x = probability(ctx.canvas.width / 8) + (ctx.canvas.width * 0.5);
+	}
+	powerup.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 8);
+	render.powerup = true;
+	pingpong.movePowerup = setInterval(function() {
+		powerup.x += powerup.speed * powerup.dir;
+	},1000/pingpong.fps);
+	setTimeout(function() {
+		if (render.powerup) {
+			render.powerup = false;
+		}
+	},1000*20);
 }
 }
 
@@ -378,7 +452,7 @@ else {
 
 function increaseBallSpeed() {
 //get the probability of 1 in 3 and increase ball speed
-if (probability(3) == 1) {
+if (probability(5) == 1) {
 	ball.speedModifier++;
 	notafication("Speed Increased!",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF",3,750);
 }
@@ -449,6 +523,19 @@ else {
 /* powerups */
 /************/
 
+function applyPowerup() {
+switch(probability(2)) {
+	case 0:
+		powerup.active = true;
+		expand(powerup.obj,2,40,10);
+		break;
+	case 1:
+		powerup.active = true;
+		shrink(powerup.obj,2,-40,10);
+		break;
+}
+}
+
 function expand(paddle,inc,amt,time) {
 //animate expansion if not active
 if (!paddle.expanded) {
@@ -474,6 +561,7 @@ if (!paddle.expanded) {
 				paddle.expanded = false;
 			}
 		},1000/pingpong.fps);
+		powerup.active = false;
 	},1000*time);
 }
 //end if powerup is already active
@@ -507,6 +595,7 @@ if (!paddle.shrunk) {
 				paddle.shrunk = false;
 			}
 		},1000/pingpong.fps);
+		powerup.active = false;
 	},1000*time);
 }
 //end if powerup is already active
