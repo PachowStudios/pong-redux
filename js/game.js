@@ -21,10 +21,11 @@ KEY = {
 }
 pingpong = {
 	fps: 60,
+	win: 10,
 	pressedKeys: [],
 	debug: false,
 	paused: false,
-	respawing: false,
+	respawning: false,
 	ball: {         
 		x: null,
 		y: null,
@@ -47,7 +48,6 @@ pingpong = {
 		color: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
-		AI: false,
 	},
 	paddleB: {
 		x: null,
@@ -60,7 +60,6 @@ pingpong = {
 		color: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
-		AI: false,
 	},
 	scoreA: {
 		value: 0,
@@ -102,7 +101,14 @@ pingpong = {
 		dir: null,
 		obj: null,
 	},
+	paddleAI: {
+		paddleA: false,
+		paddleB: false,
+	},
 	render: {
+		ball: true,
+		paddleA: true,
+		paddleB: true,
 		scoreA: true,
 		scoreB: true,
 		notafication: false,
@@ -119,7 +125,8 @@ paddleB = pingpong.paddleB;
 scoreA = pingpong.scoreA;
 scoreB = pingpong.scoreB;
 complete = pingpong.complete;
-powerup = pingpong.powerup
+powerup = pingpong.powerup;
+paddleAI = pingpong.paddleAI;
 render = pingpong.render;
 //adjust positioning according to window size
 paddleA.y = (ctx.canvas.height - paddleA.height) / 2;
@@ -185,14 +192,20 @@ if (ctx.canvas.width != window.innerWidth || ctx.canvas.height != window.innerHe
 //clear canvas
 ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
 //draw ball
-ctx.fillStyle = ball.color;
-ctx.fillRect(ball.x,ball.y,ball.width,ball.height);
+if (render.ball) {
+	ctx.fillStyle = ball.color;
+	ctx.fillRect(ball.x,ball.y,ball.width,ball.height);
+}
 //draw paddleA
-ctx.fillStyle = paddleA.color;
-ctx.fillRect(paddleA.x,paddleA.y,paddleA.width,paddleA.height + paddleA.heightModifier);
+if (render.paddleA) {
+	ctx.fillStyle = paddleA.color;
+	ctx.fillRect(paddleA.x,paddleA.y,paddleA.width,paddleA.height + paddleA.heightModifier);
+}
 //draw paddleB
-ctx.fillStyle = paddleB.color;
-ctx.fillRect(paddleB.x,paddleB.y,paddleB.width,paddleB.height + paddleB.heightModifier);
+if (render.paddleB) {
+	ctx.fillStyle = paddleB.color;
+	ctx.fillRect(paddleB.x,paddleB.y,paddleB.width,paddleB.height + paddleB.heightModifier);
+}
 //draw powerup
 if (render.powerup) {
 	ctx.fillStyle = powerup.color;
@@ -224,7 +237,7 @@ if (render.paused) {
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.3",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.4",ctx.canvas.width - 5,5);
 }
 //draw notafication
 if (render.notafication) {
@@ -238,34 +251,24 @@ if (render.notafication) {
 
 function checkInput() {
 //move paddleB up
-if (pingpong.pressedKeys[KEY.UP].isDown) {
-	if (paddleB.y > 0) {
-		paddleB.y -= paddleB.speed + paddleB.speedModifier;
-	}
+if (pingpong.pressedKeys[KEY.UP].isDown && paddleB.y > 0 && !paddleAI.paddleB) {
+	paddleB.y -= paddleB.speed + paddleB.speedModifier;
 }
-//mobe paddleb down
-if (pingpong.pressedKeys[KEY.DOWN].isDown) {
-	if (paddleB.y + paddleB.height + paddleB.heightModifier< ctx.canvas.height) {
-		paddleB.y += paddleB.speed + paddleB.speedModifier;
-	}
+//mobe paddleB down
+if (pingpong.pressedKeys[KEY.DOWN].isDown && paddleB.y + paddleB.height + paddleB.heightModifier< ctx.canvas.height && !paddleAI.paddleB) {
+	paddleB.y += paddleB.speed + paddleB.speedModifier;
 }
 //move paddleA up
-if (pingpong.pressedKeys[KEY.W].isDown) {
-	if (paddleA.y > 0) {
-		paddleA.y -= paddleA.speed + paddleA.speedModifier;
-	}
+if (pingpong.pressedKeys[KEY.W].isDown && paddleA.y > 0 && !paddleAI.paddleA) {
+	paddleA.y -= paddleA.speed + paddleA.speedModifier;
 }
 //move paddleA down
-if (pingpong.pressedKeys[KEY.S].isDown) {
-	if (paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height) {
-		paddleA.y += paddleA.speed + paddleA.speedModifier;
-	}
+if (pingpong.pressedKeys[KEY.S].isDown && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height && !paddleAI.paddleA) {
+	paddleA.y += paddleA.speed + paddleA.speedModifier;
 }
 //pause game
-if (pingpong.pressedKeys[KEY.P].isDown) {
-	if (!pingpong.pressedKeys[KEY.P].wasDown) {
-		pause();
-	}
+if (pingpong.pressedKeys[KEY.P].isDown && !pingpong.pressedKeys[KEY.P].wasDown) {
+	pause();
 }
 //slow down ball and paddles [DEBUG]
 if (pingpong.pressedKeys[KEY.D].isDown && pingpong.debug) {
@@ -281,18 +284,6 @@ else if (pingpong.pressedKeys[KEY.D].wasDown && pingpong.debug) {
 	paddleA.speedModifier += 9;
 	paddleB.speedModifier += 9;
 }
-//test paddle expansion [DEBUG]
-if (pingpong.pressedKeys[KEY.O].isDown && pingpong.debug) {
-	if (!pingpong.pressedKeys[KEY.O].wasDown) {
-		expand(paddleB,2,40,3);
-	}
-}
-//test paddle shrinkage [DEBUG]
-if (pingpong.pressedKeys[KEY.I].isDown && pingpong.debug) {
-	if (!pingpong.pressedKeys[KEY.I].wasDown) {
-		shrink(paddleB,2,-40,3);
-	}
-}
 for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
 		pingpong.pressedKeys[KEY[keyCode]].wasDown = pingpong.pressedKeys[KEY[keyCode]].isDown;
@@ -301,40 +292,39 @@ for (var keyCode in KEY) {
 }
 
 function calculateAI() {
-if (paddleA.AI) {
-	if (ball.x + (ball.width / 2) <= ctx.canvas.width * 0.4) {
-		if (ball.y + (ball.height / 2) >= paddleA.y + (paddleA.height / 2) && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height) {
-			paddleA.y += paddleA.speed + paddleA.speedModifier;
-		}
-		else if (paddleA.y > 0) {
-			paddleA.y -= paddleA.speed + paddleA.speedModifier;
-		}
+for (paddle in paddleAI) {
+	var obj = pingpong[paddle];
+	var by = ctx.canvas.height / 2;
+	if (!paddleAI[paddle]) {
+		return;
 	}
-	else {
-		if (paddleA.y + (paddleA.height / 2) <= (ctx.canvas.height / 2) - 50 && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height) {
-			paddleA.y += paddleA.speed + paddleA.speedModifier;
-		}
-		else if (paddleA.y + (paddleA.height / 2) >= (ctx.canvas.height / 2) + 50 && paddleA.y > 0) {
-			paddleA.y -= paddleA.speed + paddleA.speedModifier;
-		}
+	switch(paddle) {
+		case "paddleA":
+			if (ball.x + (ball.width / 2) <= ctx.canvas.width * 0.4 && ball.directionX == -1) {
+				by = ball.y + (ball.height / 2) - ((obj.height + obj.heightModifier) / 2);
+			}
+			if (powerup.x <= ctx.canvas.width * 0.4 || ball.directionX == 1) {
+				if (render.powerup && ball.x + (ball.width / 2) > ctx.canvas.width * 0.3) {
+					by = powerup.y + (powerup.height / 2) - ((obj.height + obj.heightModifier) / 2);
+				}
+			}
+			break;
+		case "paddleB":
+			if (ball.x + (ball.width / 2) >= ctx.canvas.width * 0.6 && ball.directionX == 1) {
+				by = ball.y + (ball.height / 2) - ((obj.height + obj.heightModifier) / 2);
+			}
+			if (powerup.x >= ctx.canvas.width * 0.6 || ball.directionX == -1) {
+				if (render.powerup && ball.x + (ball.width / 2) < ctx.canvas.width * 0.7) {
+					by = powerup.y + (powerup.height / 2) - ((obj.height + obj.heightModifier) / 2);
+				}
+			}
+			break;
 	}
-}
-if (paddleB.AI) {
-	if (ball.x + (ball.width / 2) >= ctx.canvas.width * 0.6) {
-		if (ball.y + (ball.height / 2) >= paddleB.y + (paddleB.height / 2) && paddleB.y + paddleB.height + paddleB.heightModifier < ctx.canvas.height) {
-			paddleB.y += paddleB.speed + paddleB.speedModifier;
-		}
-		else if (paddleB.y > 0) {
-			paddleB.y -= paddleB.speed + paddleB.speedModifier;
-		}
-	}
-	else {
-		if (paddleB.y + (paddleB.height / 2) <= (ctx.canvas.height / 2) - 50 && paddleB.y + paddleB.height + paddleB.heightModifier < ctx.canvas.height) {
-			paddleB.y += paddleB.speed + paddleB.speedModifier;
-		}
-		else if (paddleB.y + (paddleB.height / 2) >= (ctx.canvas.height / 2) + 50 && paddleB.y > 0) {
-			paddleB.y -= paddleB.speed + paddleB.speedModifier;
-		}
+    if (by > obj.y + ((obj.height + obj.heightModifier) / 2)) {
+        obj.y += obj.speed + obj.speedModifier;
+    }
+    else if (by < obj.y - ((obj.height + obj.heightModifier) / 2)) {
+            obj.y -= obj.speed + obj.speedModifier;
 	}
 }
 }
@@ -385,18 +375,22 @@ if (ball.x + ball.width >= paddleB.x && ball.x <= paddleB.x + paddleB.width) {
 if (ball.x < -20) {
 	//player A lost, reset ball
 	scoreB.value++;
-	respawnBall();
+	if (scoreB.value < pingpong.win) {
+		respawnBall();
+	}
 }
 //right edge
 if (ball.x > ctx.canvas.width) {
 	//player B lost, reset ball
 	scoreA.value++;
-	respawnBall();
+	if (scoreA.value < pingpong.win) {
+		respawnBall();
+	}
 }
 //powerup
 //left paddle
 if (powerup.x <= paddleA.x + paddleA.width && powerup.x + powerup.width >= paddleA.x && render.powerup) {
-	if (powerup.y + powerup.height >= paddleA.y && powerup.y <= paddleA.y + paddleA.height) {
+	if (powerup.y + powerup.height >= paddleA.y && powerup.y <= paddleA.y + paddleA.height + paddleA.heightModifier) {
 		render.powerup = false;
 		clearInterval(pingpong.movePowerup);
 		powerup.obj = paddleA;
@@ -405,7 +399,7 @@ if (powerup.x <= paddleA.x + paddleA.width && powerup.x + powerup.width >= paddl
 }
 //right paddle
 if (powerup.x + powerup.width >= paddleB.x && powerup.x <= paddleB.x + paddleB.width && render.powerup) {
-	if (powerup.y + powerup.height >= paddleB.y && powerup.y <= paddleB.y + paddleB.height) {
+	if (powerup.y + powerup.height >= paddleB.y && powerup.y <= paddleB.y + paddleB.height + paddleB.heightModifier) {
 		render.powerup = false;
 		clearInterval(pingpong.movePowerup);
 		powerup.obj = paddleB;
@@ -426,19 +420,23 @@ if (powerup.x + powerup.width >= ctx.canvas.width) {
 
 function checkComplete() {
 //check scoreA
-if (scoreA.value >= 10) {
+if (scoreA.value >= pingpong.win) {
 	complete.text = "Player 1 wins!";
 	complete.value = true;
 }
 //check scoreB
-if (scoreB.value >= 10) {
+if (scoreB.value >= pingpong.win) {
 	complete.text = "Player 2 wins!";
 	complete.value = true;
 }
 //if complete, end game
 if (complete.value == true) {
-	render.scoreA = false;
-	render.scoreB = false;
+	render.ball = false;
+	render.paddleA = false;
+	render.paddleB = false;
+	render.powerup = false;
+	scoreA.y = complete.y + 150;
+	scoreB.y = complete.y + 150;
 	render.complete = true;
 	clearInterval(pingpong.gameloop);
 	renderGraphics();
@@ -446,7 +444,7 @@ if (complete.value == true) {
 }
 
 function calculatePowerups() {
-if (probability(1000) == 1 && !render.powerup && !powerup.active && !pingpong.respawning) {
+if (probability(100) == 1 && !render.powerup && !powerup.active && !pingpong.respawning) {
 	if (probability(2) == 1) {
 		//go left
 		powerup.dir = -1;
@@ -476,7 +474,7 @@ return Math.floor(Math.random()*max);
 }
  
 function respawnBall() {
-pingpong.respawing = true;
+pingpong.respawning = true;
 //reset ball coords
 ball.x = (ctx.canvas.width / 2) - (ball.width / 2);
 ball.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 4);

@@ -6,13 +6,7 @@ overflow: hidden;
 
 #canvas {
 position: absolute;
-z-index: 1;
 background-color: #000;
-}
-
-#overlay {
-position: absolute;
-z-index: 2;
 }
 
 @font-face {
