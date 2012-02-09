@@ -239,7 +239,7 @@ if (render.paused) {
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.4",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.5beta",ctx.canvas.width - 5,5);
 }
 //draw notafication
 if (render.notafication) {
