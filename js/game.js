@@ -23,7 +23,7 @@ pingpong = {
 	fps: 60,
 	win: 10,
 	pressedKeys: [],
-	debug: false,
+	debug: true,
 	paused: false,
 	respawning: false,
 	ball: {         
@@ -102,8 +102,10 @@ pingpong = {
 		obj: null,
 	},
 	paddleAI: {
-		paddleA: false,
-		paddleB: false,
+		paddleA: true,
+		paddleB: true,
+		miss: 0,
+		difficulty: 500,
 	},
 	render: {
 		ball: true,
@@ -298,6 +300,20 @@ for (paddle in paddleAI) {
 	if (!paddleAI[paddle]) {
 		return;
 	}
+	if (paddleAI.miss == 0) {
+		switch(probability(paddleAI.difficulty)) {
+			case 0:
+				paddleAI.miss = 30;
+				break;
+			case 1:
+				paddleAI.miss = 60;
+				break;
+		}
+	}
+	else if (paddleAI.miss > 0) {
+		paddleAI.miss--;
+		return;
+	}
 	switch(paddle) {
 		case "paddleA":
 			if (ball.x + (ball.width / 2) <= ctx.canvas.width * 0.4 && ball.directionX == -1) {
@@ -318,6 +334,12 @@ for (paddle in paddleAI) {
 					by = powerup.y + (powerup.height / 2) - ((obj.height + obj.heightModifier) / 2);
 				}
 			}
+			break;
+		case "miss":
+			return;
+			break;
+		case "difficulty":
+			return;
 			break;
 	}
     if (by > obj.y + ((obj.height + obj.heightModifier) / 2)) {
