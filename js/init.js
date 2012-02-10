@@ -10,8 +10,8 @@ ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 ctxW = ctx.canvas.width;
 ctxH = ctx.canvas.height;
-ctxWD2 = ctx.canvas.width / 2;
-ctxHD2 = ctx.canvas.height / 2;
+ctxWD2 = ctxW / 2;
+ctxHD2 = ctxH / 2;
 //var arrays
 KEY = {
 	UP: 38,
@@ -23,122 +23,122 @@ KEY = {
 	O: 79,
 	I: 73
 }
-pingpong = {
+pong = {
 	fps: 60,
 	win: 10,
 	pressedKeys: [],
-	notafications: [],
+	ntfs: [],
 	debug: true,
 	paused: false,
 	respawning: false,
 	ball: {         
 		x: null,
 		y: null,
-		width: 20,
-		height: 20,
-		speed: 5,
-		speedModifier: 0,
-		directionX: 1,
-		directionY: 1,
-		color: "#FFFFFF",
+		w: 20,
+		h: 20,
+		s: 5,
+		sM: 0,
+		dirX: 1,
+		dirY: 1,
+		c: "#FFFFFF",
 	},
-	paddleA: {
+	pA: {
 		x: 100,
 		y: null,
-		width: 10,
-		height: 80,
-		heightModifier: 0,
-		speed: 8,
-		speedModifier: 0,
-		color: "#FFFFFF",
+		w: 10,
+		h: 80,
+		hM: 0,
+		s: 8,
+		sM: 0,
+		c: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
 	},
-	paddleB: {
+	pB: {
 		x: null,
 		y: null,
-		width: 10,
-		height: 80,
-		heightModifier: 0,
-		speed: 8,
-		speedModifier: 0,
-		color: "#FFFFFF",
+		w: 10,
+		h: 80,
+		hM: 0,
+		s: 8,
+		sM: 0,
+		c: "#FFFFFF",
 		expanded: false,
 		shrunk: false,
 	},
-	scoreA: {
-		value: 0,
+	sA: {
+		val: 0,
 		x: null,
 		y: 20,
-		color: "#FFFFFF",
+		c: "#FFFFFF",
 	},
-	scoreB: {
-		value: 0,
+	sB: {
+		val: 0,
 		x: null,
 		y: 20,
-		color: "#FFFFFF",
+		c: "#FFFFFF",
 	},
-	complete: {
-		value: false,
-		text: null,
+	cmpt: {
+		val: false,
+		txt: null,
 		x: null,
 		y: 20,
-		color: "#FFFFFF",
+		c: "#FFFFFF",
 	},
-	powerup: {
+	pwr: {
 		x: null,
 		y: null,
-		width: 10,
-		height: 10,
-		speed: 5,
-		color: "#FFFFFF",
+		w: 10,
+		h: 10,
+		s: 5,
+		c: "#FFFFFF",
 		active: false,
 		move: false,
 		dir: null,
 		obj: null,
 	},
-	paddleAI: {
-		paddleA: true,
-		paddleB: true,
+	pAI: {
+		pA: true,
+		pB: true,
 		miss: 0,
-		difficulty: 500,
+		diff: 500,
 	},
 	render: {
 		ball: true,
-		paddleA: true,
-		paddleB: true,
-		scoreA: true,
-		scoreB: true,
-		notafication: true,
-		powerup: false,
-		complete: false,
+		pA: true,
+		pB: true,
+		sA: true,
+		sB: true,
+		ntf: true,
+		pwr: false,
+		cmpt: false,
 		paused: false,
 		version: true
 	}
 };
 //redefine sub-arrays
-ball = pingpong.ball;
-paddleA = pingpong.paddleA;
-paddleB = pingpong.paddleB;
-scoreA = pingpong.scoreA;
-scoreB = pingpong.scoreB;
-complete = pingpong.complete;
-powerup = pingpong.powerup;
-paddleAI = pingpong.paddleAI;
-render = pingpong.render;
+ball = pong.ball;
+pA = pong.pA;
+pB = pong.pB;
+sA = pong.sA;
+sB = pong.sB;
+cmpt = pong.cmpt;
+pwr = pong.pwr;
+pAI = pong.pAI;
+render = pong.render;
 //adjust positioning according to window size
-paddleA.y = (ctxH - paddleA.height) / 2;
-paddleB.y = (ctxH - paddleB.height) / 2;
-paddleB.x = ctxW - 100 - paddleB.width;
-scoreA.x = ctxWD2 - 200;
-scoreB.x = ctxWD2 + 200;
-complete.x = ctxWD2;
+pA.y = (ctxH - pA.h) / 2;
+pB.y = (ctxH - pB.h) / 2;
+pB.x = ctxW - 100 - pB.w;
+sA.x = ctxWD2 - 200;
+sB.x = ctxWD2 + 200;
+cmpt.x = ctxWD2;
 //get the ball rolling (not really)
 respawnBall();
 //initialize key listeners
 for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
-		pingpong.pressedKeys[KEY[keyCode]] = {
+		pong.pressedKeys[KEY[keyCode]] = {
 			isDown: false,
 			wasDown: false
 		};
@@ -147,17 +147,17 @@ for (var keyCode in KEY) {
 $(document).keydown(function(e) {
 	for (var x in KEY) {
 		if (KEY[x] == e.which) {
-			pingpong.pressedKeys[e.which].isDown = true;
+			pong.pressedKeys[e.which].isDown = true;
 		}
 	}
 });
 $(document).keyup(function(e) {
 	for (var x in KEY) {
 		if (KEY[x] == e.which) {
-			pingpong.pressedKeys[e.which].isDown = false;
+			pong.pressedKeys[e.which].isDown = false;
 		}
 	}
 });
 //initialize gameloop
-pingpong.gameloop = setInterval(gameloop,1000/pingpong.fps);
+pong.gameloop = setInterval(gameloop,1000/pong.fps);
 }

@@ -1,68 +1,68 @@
 /************/
-/* powerups */
+/* pwrs */
 /************/
 
-function applyPowerup() {
-switch(probability(4)) {
-	//expand powerup
+function applypwr() {
+switch(rand(4)) {
+	//exp pwr
 	case 0:
-		powerup.active = true;
-		expand(powerup.obj,2,40,10);
+		pwr.active = true;
+		exp(pwr.obj,2,40,10);
 		break;
 	//shrink powerdown
 	case 1:
-		powerup.active = true;
-		shrink(powerup.obj,2,-40,10);
+		pwr.active = true;
+		shrink(pwr.obj,2,-40,10);
 		break;
-	//speed powerup
+	//s pwr
 	case 2:
-		powerup.active = true;
-		paddleSpeed(powerup.obj,8,10);
+		pwr.active = true;
+		paddles(pwr.obj,8,10);
 		break;
-	//speed powerdown
+	//s powerdown
 	case 3:
-		powerup.active = true;
-		paddleSpeed(powerup.obj,-4,10);
+		pwr.active = true;
+		paddles(pwr.obj,-4,10);
 		break;
 }
 }
 
-function expand(paddle,inc,amt,time) {
+function exp(paddle,inc,amt,time) {
 //animate expansion if not active
-if (!paddle.expanded) {
+if (!paddle.expd) {
 	if (paddle.x <= ctxWD2) {
-		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
+		pong.ntfs.push(ntf({txt:"Paddle Expand!",x:10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 	}
 	else {
-		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
+		pong.ntfs.push(ntf({txt:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 	}
-	//get current height modifier for reference
-	var origM = paddle.heightModifier;
-	paddle.expanded = true;
-	paddle.expand_expandloop = setInterval(function() {
-		paddle.heightModifier += inc;
+	//get current h M for reference
+	var origM = paddle.hM;
+	paddle.expd = true;
+	paddle.exp_exploop = setInterval(function() {
+		paddle.hM += inc;
 		paddle.y -= inc / 2;
-		if (paddle.heightModifier >= amt + origM) {
-			clearInterval(paddle.expand_expandloop);
+		if (paddle.hM >= amt + origM) {
+			clearInterval(paddle.exp_exploop);
 		}
-	},1000/pingpong.fps);
+	},1000/pong.fps);
 	//return to normal size after set time
 	setTimeout(function() {
-		//update current height modifier in case it changed due to multiple powerups
-		var newM = paddle.heightModifier;
-		paddle.expand_shrinkloop = setInterval(function() {
-			paddle.heightModifier -= inc;
+		//update current h M in case it changed due to multiple pwrs
+		var newM = paddle.hM;
+		paddle.exp_shrinkloop = setInterval(function() {
+			paddle.hM -= inc;
 			paddle.y += inc / 2;
-			if (paddle.heightModifier <= newM - amt) {
-				clearInterval(paddle.expand_shrinkloop);
-				paddle.expanded = false;
-				powerup.active = false;
+			if (paddle.hM <= newM - amt) {
+				clearInterval(paddle.exp_shrinkloop);
+				paddle.expd = false;
+				pwr.active = false;
 			}
-		},1000/pingpong.fps);
+		},1000/pong.fps);
 	},1000*time);
 }
-//end if powerup is already active
-else if (paddle.expanded) {
+//end if pwr is already active
+else if (paddle.expd) {
 	return
 }
 }
@@ -71,69 +71,69 @@ function shrink(paddle,inc,amt,time) {
 //animate shrinkage if not active
 if (!paddle.shrunk) {
 	if (paddle.x <= ctxWD2) {
-		pingpong.notafications.push(notafication({text:"Paddle Shrink!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
+		pong.ntfs.push(ntf({txt:"Paddle Shrink!",x:10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 	}
 	else {
-		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
+		pong.ntfs.push(ntf({txt:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 	}
-	//get current height modifier for reference
-	var origM = paddle.heightModifier;
+	//get current h M for reference
+	var origM = paddle.hM;
 	paddle.shrunk = true;
 	paddle.shrink_shrinkloop = setInterval(function() {
-		paddle.heightModifier -= inc;
+		paddle.hM -= inc;
 		paddle.y += inc / 2;
-		if (paddle.heightModifier <= amt + origM) {
+		if (paddle.hM <= amt + origM) {
 			clearInterval(paddle.shrink_shrinkloop);
 		}
-	},1000/pingpong.fps);
+	},1000/pong.fps);
 	//return to normal size after set time
 	setTimeout(function() {
-		//update current height modifier in case it changed due to multiple powerups
-		var newM = paddle.heightModifier;
-		paddle.shrink_expandloop = setInterval(function() {
-			paddle.heightModifier += inc;
+		//update current h M in case it changed due to multiple pwrs
+		var newM = paddle.hM;
+		paddle.shrink_exploop = setInterval(function() {
+			paddle.hM += inc;
 			paddle.y -= inc / 2;
-			if (paddle.heightModifier >= newM - amt) {
-				clearInterval(paddle.shrink_expandloop);
+			if (paddle.hM >= newM - amt) {
+				clearInterval(paddle.shrink_exploop);
 				paddle.shrunk = false;
-				powerup.active = false;
+				pwr.active = false;
 			}
-		},1000/pingpong.fps);
+		},1000/pong.fps);
 	},1000*time);
 }
-//end if powerup is already active
+//end if pwr is already active
 else if (paddle.shrunk) {
 	return
 }
 }
 
-function paddleSpeed(paddle,amt,time) {
-if (!paddle.speedpowerup) {
+function paddles(paddle,amt,time) {
+if (!paddle.spwr) {
 	if (amt >= 0) {
 		if (paddle.x <= ctxWD2) {
-			pingpong.notafications.push(notafication({text:"Paddle Speedup!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
+			pong.ntfs.push(ntf({txt:"Paddle Speedup!",x:10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 		}
 		else {
-			pingpong.notafications.push(notafication({text:"Paddle Speedup!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
+			pong.ntfs.push(ntf({txt:"Paddle Speedup!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 		}
 	}
 	else {
 		if (paddle.x <= ctxWD2) {
-			pingpong.notafications.push(notafication({text:"Paddle Slowdown!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
+			pong.ntfs.push(ntf({txt:"Paddle Slowdown!",x:10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 		}
 		else {
-			pingpong.notafications.push(notafication({text:"Paddle Slowdown!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
+			pong.ntfs.push(ntf({txt:"Paddle Slowdown!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",c:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 		}
 	}
-	paddle.speedpowerup = true;
-	paddle.speedModifier += amt;
+	paddle.spwr = true;
+	paddle.sM += amt;
 	setTimeout(function() {
-		paddle.speedModifier -= amt;
-		paddle.speedpowerup = false;
-		powerup.active = false;
+		paddle.sM -= amt;
+		paddle.spwr = false;
+		pwr.active = false;
 	},1000*time);
 }
-else if (paddle.speedpowerup) {
+else if (paddle.spwr) {
 	return
 }
 }
