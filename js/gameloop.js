@@ -10,21 +10,22 @@ checkCollision();
 checkComplete();
 calculatePowerups();
 renderGraphics();
+trimArrays();
 }
 
 function renderGraphics() {
 //resize if window size changes
-if (ctx.canvas.width != window.innerWidth || ctx.canvas.height != window.innerHeight) {
-	ctx.canvas.width = window.innerWidth;
-	ctx.canvas.height = window.innerHeight;
-	paddleA.y = (ctx.canvas.height - paddleA.height) / 2;
-	paddleB.y = (ctx.canvas.height - paddleB.height) / 2;
-	paddleB.x = ctx.canvas.width - 100 - paddleB.width;
-	scoreA.x = (ctx.canvas.width / 2) - 200;
-	scoreB.x = (ctx.canvas.width / 2) + 200;
+if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
+	ctxW = window.innerWidth;
+	ctxH = window.innerHeight;
+	paddleA.y = (ctxH - paddleA.height) / 2;
+	paddleB.y = (ctxH - paddleB.height) / 2;
+	paddleB.x = ctxW - 100 - paddleB.width;
+	scoreA.x = ctxWD2 - 200;
+	scoreB.x = ctxWD2 + 200;
 }
 //clear canvas
-ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
+ctx.clearRect(0,0,ctxW,ctxH)
 //draw ball
 if (render.ball) {
 	ctx.fillStyle = ball.color;
@@ -65,21 +66,25 @@ if (render.complete) {
 //draw pause screen
 if (render.paused) {
 	ctx.fillStyle = "#FFFFFF";
-	ctx.fillText("Paused",ctx.canvas.width / 2,20);
+	ctx.fillText("Paused",ctxWD2,20);
 }
 //draw version number
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.5beta",ctx.canvas.width - 5,5);
+	ctx.fillText("v1.5beta",ctxW - 5,5);
 }
 //draw notafication
 if (render.notafication) {
-	ctx.font = notafication.font;
-	ctx.textAlign = notafication.align;
-	ctx.textBaseline = notafication.baseline;
-	ctx.fillStyle = notafication.color;
-	ctx.fillText(notafication.text,notafication.x,notafication.y);
+	pingpong.notafications.forEach(function notafication(I) {
+		ctx.font = I.font;
+		ctx.textAlign = I.align;
+		ctx.textBaseline = I.baseline;
+		ctx.fillStyle = I.color;
+		if (I.render) {
+			ctx.fillText(I.text,I.x,I.y);
+		}
+	});
 }
 }
 
@@ -89,7 +94,7 @@ if (pingpong.pressedKeys[KEY.UP].isDown && paddleB.y > 0 && !paddleAI.paddleB) {
 	paddleB.y -= paddleB.speed + paddleB.speedModifier;
 }
 //mobe paddleB down
-if (pingpong.pressedKeys[KEY.DOWN].isDown && paddleB.y + paddleB.height + paddleB.heightModifier< ctx.canvas.height && !paddleAI.paddleB) {
+if (pingpong.pressedKeys[KEY.DOWN].isDown && paddleB.y + paddleB.height + paddleB.heightModifier< ctxH && !paddleAI.paddleB) {
 	paddleB.y += paddleB.speed + paddleB.speedModifier;
 }
 //move paddleA up
@@ -97,7 +102,7 @@ if (pingpong.pressedKeys[KEY.W].isDown && paddleA.y > 0 && !paddleAI.paddleA) {
 	paddleA.y -= paddleA.speed + paddleA.speedModifier;
 }
 //move paddleA down
-if (pingpong.pressedKeys[KEY.S].isDown && paddleA.y + paddleA.height + paddleA.heightModifier < ctx.canvas.height && !paddleAI.paddleA) {
+if (pingpong.pressedKeys[KEY.S].isDown && paddleA.y + paddleA.height + paddleA.heightModifier < ctxH && !paddleAI.paddleA) {
 	paddleA.y += paddleA.speed + paddleA.speedModifier;
 }
 //pause game
@@ -128,7 +133,7 @@ for (var keyCode in KEY) {
 function calculateAI() {
 for (paddle in paddleAI) {
 	var obj = pingpong[paddle];
-	var by = ctx.canvas.height / 2;
+	var by = ctxHD2;
 	if (!paddleAI[paddle]) {
 		return;
 	}
@@ -148,21 +153,21 @@ for (paddle in paddleAI) {
 	}
 	switch(paddle) {
 		case "paddleA":
-			if (ball.x + (ball.width / 2) <= ctx.canvas.width * 0.4 && ball.directionX == -1) {
+			if (ball.x + (ball.width / 2) <= ctxW * 0.4 && ball.directionX == -1) {
 				by = ball.y + (ball.height / 2) - ((obj.height + obj.heightModifier) / 2);
 			}
-			if (powerup.x <= ctx.canvas.width * 0.4 || ball.directionX == 1) {
-				if (render.powerup && ball.x + (ball.width / 2) > ctx.canvas.width * 0.3) {
+			if (powerup.x <= ctxW * 0.4 || ball.directionX == 1) {
+				if (render.powerup && ball.x + (ball.width / 2) > ctxW * 0.3) {
 					by = powerup.y + (powerup.height / 2) - ((obj.height + obj.heightModifier) / 2);
 				}
 			}
 			break;
 		case "paddleB":
-			if (ball.x + (ball.width / 2) >= ctx.canvas.width * 0.6 && ball.directionX == 1) {
+			if (ball.x + (ball.width / 2) >= ctxW * 0.6 && ball.directionX == 1) {
 				by = ball.y + (ball.height / 2) - ((obj.height + obj.heightModifier) / 2);
 			}
-			if (powerup.x >= ctx.canvas.width * 0.6 || ball.directionX == -1) {
-				if (render.powerup && ball.x + (ball.width / 2) < ctx.canvas.width * 0.7) {
+			if (powerup.x >= ctxW * 0.6 || ball.directionX == -1) {
+				if (render.powerup && ball.x + (ball.width / 2) < ctxW * 0.7) {
 					by = powerup.y + (powerup.height / 2) - ((obj.height + obj.heightModifier) / 2);
 				}
 			}
@@ -189,7 +194,7 @@ if (ball.y < 0) {
 	ball.directionY = 1;
 }
 //check bottom edge
-if (ball.y + 20 > ctx.canvas.height) {
+if (ball.y + 20 > ctxH) {
 	ball.directionY = -1;
 }
 //actualy move the ball
@@ -234,7 +239,7 @@ if (ball.x < -20) {
 	}
 }
 //right edge
-if (ball.x > ctx.canvas.width) {
+if (ball.x > ctxW) {
 	//player B lost, reset ball
 	scoreA.value++;
 	if (scoreA.value < pingpong.win) {
@@ -266,7 +271,7 @@ if (powerup.x <= 0) {
 	powerup.move = false;
 }
 //right edge
-if (powerup.x + powerup.width >= ctx.canvas.width) {
+if (powerup.x + powerup.width >= ctxW) {
 	render.powerup = false;
 	powerup.move = false;
 }
@@ -302,18 +307,24 @@ if (probability(100) == 1 && !render.powerup && !powerup.active && !pingpong.res
 	if (probability(2) == 1) {
 		//go left
 		powerup.dir = -1;
-		powerup.x = probability(ctx.canvas.width / 8) + (ctx.canvas.width * 0.25);
+		powerup.x = probability(ctxW / 8) + (ctxW * 0.25);
 	}
 	else {
 		//go right
 		powerup.dir = 1;
-		powerup.x = probability(ctx.canvas.width / 8) + (ctx.canvas.width * 0.5);
+		powerup.x = probability(ctxW / 8) + (ctxW * 0.5);
 	}
-	powerup.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 8);
+	powerup.y = probability(ctxHD2) + (ctxH / 8);
 	render.powerup = true;
 	powerup.move = true;
 }
 if (powerup.move) {
 	powerup.x += powerup.speed * powerup.dir;
 }
+}
+
+function trimArrays() {
+pingpong.notafications = pingpong.notafications.filter(function notafication(I) {
+	return I.active;
+});
 }

@@ -10,8 +10,8 @@ return Math.floor(Math.random()*max);
 function respawnBall() {
 pingpong.respawning = true;
 //reset ball coords
-ball.x = (ctx.canvas.width / 2) - (ball.width / 2);
-ball.y = probability(ctx.canvas.height / 2) + (ctx.canvas.height / 4);
+ball.x = ctxWD2 - (ball.width / 2);
+ball.y = probability(ctxHD2) + (ctxH / 4);
 var dspeed = ball.speed;
 ball.speed = 0;
 ball.speedModifier = 0;
@@ -28,15 +28,15 @@ if (probability(2) == 0) {
 else {
 	ball.directionY = -1;
 }
-notafication("3",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+pingpong.notafications.push(notafication({text:"3",x:ctxWD2,y:ctxH - 100,font:"60px pong",color:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
 setTimeout(function() {
-	notafication("2",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+	pingpong.notafications.push(notafication({text:"2",x:ctxWD2,y:ctxH - 100,font:"60px pong",color:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
 },500);
 setTimeout(function() {
-	notafication("1",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+	pingpong.notafications.push(notafication({text:"1",x:ctxWD2,y:ctxH - 100,font:"60px pong",color:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
 },1000);
 setTimeout(function() {
-	notafication("GO",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",1,1000);
+	pingpong.notafications.push(notafication({text:"GO",x:ctxWD2,y:ctxH - 100,font:"60px pong",color:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
 	ball.speed = dspeed;
 	pingpong.respawning = false;
 },1500);
@@ -46,36 +46,30 @@ function increaseBallSpeed() {
 //get the probability of 1 in 4 and increase ball speed
 if (probability(4) == 1) {
 	ball.speedModifier++;
-	notafication("Speed Increased!",ctx.canvas.width / 2,ctx.canvas.height - 100,"#FFFFFF","60px pong","center","top",3,750);
+	pingpong.notafications.push(notafication({text:"Speed Increased!",x:ctxWD2,y:ctxH - 100,font:"60px pong",color:"#FFFFFF",baseline:"top",align:"center",count:3,interval:750}));
 }
 }
 
-function notafication(text,x,y,color,font,align,baseline,count,interval) {
-//apply passed vars to global vars
-notafication.text = text;
-notafication.x = x;
-notafication.y = y;
-notafication.color = color;
-notafication.font = font;
-notafication.align = align;
-notafication.baseline = baseline;
-//enable notafication rendering
-render.notafication = true;
-//toggle notafication x times
-clearInterval(pingpong.flashTimer);
-pingpong.flashTimer = setInterval(function() {
-	count--;
-	if (count%2 == 1) {
-		render.notafication = true;
+function notafication(I) {
+I.active = true;
+I.render = true;
+I.flashTimer = setInterval(function() {
+	if (!pingpong.paused) {
+		I.count--;
+		if (I.count%2 == 1) {
+			I.render = true;
+		}
+		else {
+			I.render = false;
+		}
+		if (I.count == 0) {
+			clearInterval(I.flashTimer);
+			I.render = false;
+			I.active = false;
+		}
 	}
-	else {
-		render.notafication = false;
-	}
-	if (count == 0) {
-		clearInterval(pingpong.flashTimer);
-		render.notafication = false;
-	}
-},interval);
+},I.interval);
+return I;
 }
 
 function pause() {

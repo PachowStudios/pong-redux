@@ -8,6 +8,10 @@ canvas = document.getElementById("canvas");
 ctx = canvas.getContext("2d");
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
+ctxW = ctx.canvas.width;
+ctxH = ctx.canvas.height;
+ctxWD2 = ctx.canvas.width / 2;
+ctxHD2 = ctx.canvas.height / 2;
 //var arrays
 KEY = {
 	UP: 38,
@@ -23,6 +27,7 @@ pingpong = {
 	fps: 60,
 	win: 10,
 	pressedKeys: [],
+	notafications: [],
 	debug: true,
 	paused: false,
 	respawning: false,
@@ -80,15 +85,6 @@ pingpong = {
 		y: 20,
 		color: "#FFFFFF",
 	},
-	notafication: {
-		text: null,
-		x: null,
-		y: null,
-		color: "#FFFFFF",
-		font: "60px pong",
-		align: "center",
-		baseline: "top",
-	},
 	powerup: {
 		x: null,
 		y: null,
@@ -113,7 +109,7 @@ pingpong = {
 		paddleB: true,
 		scoreA: true,
 		scoreB: true,
-		notafication: false,
+		notafication: true,
 		powerup: false,
 		complete: false,
 		paused: false,
@@ -131,12 +127,12 @@ powerup = pingpong.powerup;
 paddleAI = pingpong.paddleAI;
 render = pingpong.render;
 //adjust positioning according to window size
-paddleA.y = (ctx.canvas.height - paddleA.height) / 2;
-paddleB.y = (ctx.canvas.height - paddleB.height) / 2;
-paddleB.x = ctx.canvas.width - 100 - paddleB.width;
-scoreA.x = (ctx.canvas.width / 2) - 200;
-scoreB.x = (ctx.canvas.width / 2) + 200;
-complete.x = (ctx.canvas.width / 2);
+paddleA.y = (ctxH - paddleA.height) / 2;
+paddleB.y = (ctxH - paddleB.height) / 2;
+paddleB.x = ctxW - 100 - paddleB.width;
+scoreA.x = ctxWD2 - 200;
+scoreB.x = ctxWD2 + 200;
+complete.x = ctxWD2;
 //get the ball rolling (not really)
 respawnBall();
 //initialize key listeners

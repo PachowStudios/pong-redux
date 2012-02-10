@@ -30,11 +30,11 @@ switch(probability(4)) {
 function expand(paddle,inc,amt,time) {
 //animate expansion if not active
 if (!paddle.expanded) {
-	if (paddle.x <= ctx.canvas.width / 2) {
-		notafication("Paddle Expand!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+	if (paddle.x <= ctxWD2) {
+		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 	}
 	else {
-		notafication("Paddle Expand!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 	}
 	//get current height modifier for reference
 	var origM = paddle.heightModifier;
@@ -70,11 +70,11 @@ else if (paddle.expanded) {
 function shrink(paddle,inc,amt,time) {
 //animate shrinkage if not active
 if (!paddle.shrunk) {
-	if (paddle.x <= ctx.canvas.width / 2) {
-		notafication("Paddle Shrink!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+	if (paddle.x <= ctxWD2) {
+		pingpong.notafications.push(notafication({text:"Paddle Shrink!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 	}
 	else {
-		notafication("Paddle Shrink!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+		pingpong.notafications.push(notafication({text:"Paddle Expand!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 	}
 	//get current height modifier for reference
 	var origM = paddle.heightModifier;
@@ -110,19 +110,19 @@ else if (paddle.shrunk) {
 function paddleSpeed(paddle,amt,time) {
 if (!paddle.speedpowerup) {
 	if (amt >= 0) {
-		if (paddle.x <= ctx.canvas.width / 2) {
-			notafication("Paddle Speedup!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+		if (paddle.x <= ctxWD2) {
+			pingpong.notafications.push(notafication({text:"Paddle Speedup!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 		}
 		else {
-			notafication("Paddle Speedup!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+			pingpong.notafications.push(notafication({text:"Paddle Speedup!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 		}
 	}
 	else {
-		if (paddle.x <= ctx.canvas.width / 2) {
-			notafication("Paddle Slowdown!",10,ctx.canvas.height - 10,"#FFFFFF","30px pong","left","bottom",3,750);
+		if (paddle.x <= ctxWD2) {
+			pingpong.notafications.push(notafication({text:"Paddle Slowdown!",x:10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"left",count:3,interval:750}));
 		}
 		else {
-			notafication("Paddle Slowdown!",ctx.canvas.width - 10,ctx.canvas.height - 10,"#FFFFFF","30px pong","right","bottom",3,750);
+			pingpong.notafications.push(notafication({text:"Paddle Slowdown!",x:ctxW - 10,y:ctxH - 10,font:"30px pong",color:"#FFFFFF",baseline:"bottom",align:"right",count:3,interval:750}));
 		}
 	}
 	paddle.speedpowerup = true;
