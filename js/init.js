@@ -100,8 +100,10 @@ pong = {
 	pAI: {
 		pA: true,
 		pB: true,
+	},
+	pAIOpt: {
 		miss: 0,
-		diff: 500,
+		diff: 1000,
 	},
 	render: {
 		ball: true,
@@ -125,6 +127,7 @@ sB = pong.sB;
 cmpt = pong.cmpt;
 pwr = pong.pwr;
 pAI = pong.pAI;
+pAIOpt = pong.pAIOpt;
 render = pong.render;
 //adjust positioning according to window size
 pA.y = (ctxH - pA.h) / 2;

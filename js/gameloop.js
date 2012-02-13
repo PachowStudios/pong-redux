@@ -141,47 +141,35 @@ for (paddle in pAI) {
 	if (!pAI[paddle]) {
 		return;
 	}
-	if (pAI.miss == 0) {
-		switch(rand(pAI.diff)) {
+	if (pAIOpt.miss == 0) {
+		switch(rand(pAIOpt.diff)) {
 			case 0:
-				pAI.miss = 30;
+				pAIOpt.miss = 30;
 				break;
 			case 1:
-				pAI.miss = 60;
+				pAIOpt.miss = 60;
 				break;
 		}
 	}
-	else if (pAI.miss > 0) {
-		pAI.miss--;
+	else if (pAIOpt.miss > 0) {
+		pAIOpt.miss--;
 		return;
 	}
-	switch(paddle) {
-		case "pA":
-			if (ball.x + (ball.w / 2) <= ctxW * 0.4 && ball.dirX == -1) {
-				by = ball.y + (ball.h / 2) - ((obj.h + obj.hM) / 2);
-			}
-			if (pwr.x <= ctxW * 0.4 && render.pwr) {
-				if (ball.dirX == 1 || ball.x + (ball.w / 2) > ctxW * 0.3) {
-					by = pwr.y + (pwr.h / 2) - ((obj.h + obj.hM) / 2);
-				}
-			}
+	switch(obj) {
+		case pA:
+			var dir = -1;
 			break;
-		case "pB":
-			if (ball.x + (ball.w / 2) >= ctxW * 0.6 && ball.dirX == 1) {
-				by = ball.y + (ball.h / 2) - ((obj.h + obj.hM) / 2);
-			}
-			if (pwr.x >= ctxW * 0.6 && render.pwr) {
-				if (ball.dirX == -1 || ball.x + (ball.w / 2) < ctxW * 0.7) {
-					by = pwr.y + (pwr.h / 2) - ((obj.h + obj.hM) / 2);
-				}
-			}
+		case pB:
+			var dir = 1;
 			break;
-		case "miss":
-			return;
-			break;
-		case "diff":
-			return;
-			break;
+	}
+	if (dist(ball,obj) <= ctxW * 0.3 && ball.dirX == dir) {
+		by = ball.y + (ball.h / 2) - ((obj.h + obj.hM) / 2);
+	}
+	if (dist(pwr,obj) <= ctxW * 0.3 && render.pwr) {
+		if (ball.dirX == dir * -1 || dist(ball,obj) > ctxW * 0.2) {
+			by = pwr.y + (pwr.h / 2) - ((obj.h + obj.hM) / 2);
+		}
 	}
     if (by > obj.y + ((obj.h + obj.hM) / 2)) {
         obj.y += obj.s + obj.sM;

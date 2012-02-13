@@ -6,6 +6,14 @@ function rand(max) {
 //generate a random whole number between 0 and max
 return Math.floor(Math.random()*max);
 }
+
+function dist(p1,p2) {
+var xs = p2.x - p1.x;
+var ys = p2.y - p1.y;
+var xs = xs * xs;
+var ys = ys * ys;
+return Math.floor(Math.sqrt(xs + ys));
+}
  
 function respawnBall() {
 pong.respawning = true;
@@ -31,15 +39,15 @@ else {
 pong.ntfs.push(ntf({txt:"3",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
 setTimeout(function() {
 	pong.ntfs.push(ntf({txt:"2",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
+	setTimeout(function() {
+		pong.ntfs.push(ntf({txt:"1",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
+			setTimeout(function() {
+				pong.ntfs.push(ntf({txt:"GO",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
+				ball.s = ds;
+				pong.respawning = false;
+			},500);
+	},500);
 },500);
-setTimeout(function() {
-	pong.ntfs.push(ntf({txt:"1",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
-},1000);
-setTimeout(function() {
-	pong.ntfs.push(ntf({txt:"GO",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
-	ball.s = ds;
-	pong.respawning = false;
-},1500);
 }
 
 function increaseBalls() {
