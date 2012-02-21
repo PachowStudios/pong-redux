@@ -92,7 +92,7 @@ pong = {
 		move: false,
 		dir: null,
 		obj: null,
-		rsp: 0;
+		rsp: 0,
 	},
 	pAI: {
 		pA: true,

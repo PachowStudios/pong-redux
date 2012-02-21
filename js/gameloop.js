@@ -295,7 +295,7 @@ if (cmpt.val == true) {
 }
 
 function calculatePwrs() {
-if (rand(1000) == 1 && !render.pwr && !pong.respawning && pwr.rsp = 0) {
+if (rand(1000) == 1 && !render.pwr && !pong.respawning && pwr.rsp == 0) {
 	if (rand(2) == 1) {
 		//go left
 		pwr.dir = -1;
