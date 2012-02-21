@@ -7,8 +7,8 @@ checkInput();
 calculateAI();
 moveBall();
 checkCollision();
-checkcmpt();
-calculatePowerups();
+checkCmpt();
+calculatePwrs();
 renderGraphics();
 trimArrays();
 }
@@ -81,9 +81,9 @@ if (render.version) {
 //draw ntf
 if (render.ntf) {
 	pong.ntfs.forEach(function ntf(I) {
-		ctx.font = I.font;
-		ctx.textAlign = I.align;
-		ctx.textBaseline = I.baseline;
+		ctx.font = I.f;
+		ctx.textAlign = I.a;
+		ctx.textBaseline = I.b;
 		ctx.fillStyle = I.c;
 		if (I.render) {
 			ctx.fillText(I.txt,I.x,I.y);
@@ -117,15 +117,15 @@ if (pong.pressedKeys[KEY.P].isDown && !pong.pressedKeys[KEY.P].wasDown) {
 if (pong.pressedKeys[KEY.D].isDown && pong.debug) {
 	if (!pong.pressedKeys[KEY.D].wasDown) {
 		ball.sM -= 4.5;
-		pA.sM -= 9;
-		pB.sM -= 9;
+		pA.sM -= 7;
+		pB.sM -= 7;
 	}
 } 
 //return ball and paddles to normal speed [DEBUG]
 else if (pong.pressedKeys[KEY.D].wasDown && pong.debug) {
 	ball.sM += 4.5;
-	pA.sM += 9;
-	pB.sM += 9;
+	pA.sM += 7;
+	pB.sM += 7;
 }
 for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
@@ -186,7 +186,7 @@ if (ball.y < 0) {
 	ball.dirY = 1;
 }
 //check bottom edge
-if (ball.y + 20 > ctxH) {
+if (ball.y + ball.h > ctxH) {
 	ball.dirY = -1;
 }
 //actualy move the ball
@@ -206,7 +206,7 @@ if (ball.x <= pA.x + pA.w && ball.x + ball.w >= pA.x) {
 		else if (ball.y + (ball.h / 2) >= pA.y + (pA.h * 0.75)) {
 			ball.dirY = 1;
 		}
-		increaseBalls();
+		increaseBallSpeed();
 	}
 }
 //right paddle
@@ -219,7 +219,7 @@ if (ball.x + ball.w >= pB.x && ball.x <= pB.x + pB.w) {
 		else if (ball.y + (ball.h / 2) >= pB.y + (pB.h * 0.75)) {
 			ball.dirY = 1;
 		}
-		increaseBalls();
+		increaseBallSpeed();
 	}
 }
 //left edge
@@ -245,7 +245,7 @@ if (pwr.x <= pA.x + pA.w && pwr.x + pwr.w >= pA.x && render.pwr) {
 		render.pwr = false;
 		clearInterval(pong.movepwr);
 		pwr.obj = pA;
-		applypwr();
+		pong.pwrs.push(pwrup({amt:40,amtS:4,inc:1,time:10}));
 	}
 }
 //right paddle
@@ -254,7 +254,7 @@ if (pwr.x + pwr.w >= pB.x && pwr.x <= pB.x + pB.w && render.pwr) {
 		render.pwr = false;
 		clearInterval(pong.movepwr);
 		pwr.obj = pB;
-		applypwr();
+		pong.pwrs.push(pwrup({amt:40,amtS:4,inc:1,time:10}));
 	}
 }
 //left edge
@@ -269,7 +269,7 @@ if (pwr.x + pwr.w >= ctxW) {
 }
 }
 
-function checkcmpt() {
+function checkCmpt() {
 //check scoreA
 if (sA.val >= pong.win) {
 	cmpt.txt = "Player 1 wins!";
@@ -294,29 +294,41 @@ if (cmpt.val == true) {
 }
 }
 
-function calculatePowerups() {
-if (rand(100) == 1 && !render.pwr && !pwr.active && !pong.respawning) {
+function calculatePwrs() {
+if (rand(1000) == 1 && !render.pwr && !pong.respawning && pwr.rsp = 0) {
 	if (rand(2) == 1) {
 		//go left
 		pwr.dir = -1;
-		pwr.x = rand(ctxW / 8) + (ctxW * 0.25);
+		pwr.x = rand(ctxW / 8) + (ctxW * 0.375);
 	}
 	else {
 		//go right
 		pwr.dir = 1;
 		pwr.x = rand(ctxW / 8) + (ctxW * 0.5);
 	}
-	pwr.y = rand(ctxHD2) + (ctxH / 8);
+	pwr.y = rand(ctxHD2) + (ctxH / 4);
 	render.pwr = true;
 	pwr.move = true;
+	pwr.rsp = 60 * 5;
 }
 if (pwr.move) {
 	pwr.x += pwr.s * pwr.dir;
 }
+pong.pwrs.forEach(function pwrup(I) {
+	if (I.timer > 0) I.timer--;
+	else {
+		I.active = false;
+		I.end();
+	}
+});
+if (pwr.rsp > 0) pwr.rsp--;
 }
 
 function trimArrays() {
 pong.ntfs = pong.ntfs.filter(function ntf(I) {
+	return I.active;
+});
+pong.pwrs = pong.pwrs.filter(function pwrup(I) {
 	return I.active;
 });
 }

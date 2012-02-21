@@ -3,7 +3,7 @@
 /*********************/
 
 function rand(max) {
-//generate a random whole number between 0 and max
+//generate a random whole number between 0 and max (non inclusive)
 return Math.floor(Math.random()*max);
 }
 
@@ -14,7 +14,7 @@ var xs = xs * xs;
 var ys = ys * ys;
 return Math.floor(Math.sqrt(xs + ys));
 }
- 
+
 function respawnBall() {
 pong.respawning = true;
 //reset ball coords
@@ -36,25 +36,25 @@ if (rand(2) == 0) {
 else {
 	ball.dirY = -1;
 }
-pong.ntfs.push(ntf({txt:"3",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
+pong.ntfs.push(ntf({txt:"3",x:ctxWD2,y:ctxH - 100,f:"60px pong",c:"#FFFFFF",b:"top",a:"center",cn:1,i:500}));
 setTimeout(function() {
-	pong.ntfs.push(ntf({txt:"2",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
+	pong.ntfs.push(ntf({txt:"2",x:ctxWD2,y:ctxH - 100,f:"60px pong",c:"#FFFFFF",b:"top",a:"center",cn:1,i:500}));
 	setTimeout(function() {
-		pong.ntfs.push(ntf({txt:"1",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
-			setTimeout(function() {
-				pong.ntfs.push(ntf({txt:"GO",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:1,interval:500}));
-				ball.s = ds;
-				pong.respawning = false;
-			},500);
+		pong.ntfs.push(ntf({txt:"1",x:ctxWD2,y:ctxH - 100,f:"60px pong",c:"#FFFFFF",b:"top",a:"center",cn:1,i:500}));
+		setTimeout(function() {
+			pong.ntfs.push(ntf({txt:"GO",x:ctxWD2,y:ctxH - 100,f:"60px pong",c:"#FFFFFF",b:"top",a:"center",cn:1,i:500}));
+			ball.s = ds;
+			pong.respawning = false;
+		},500);
 	},500);
 },500);
 }
 
-function increaseBalls() {
+function increaseBallSpeed() {
 //get the rand of 1 in 4 and increase ball s
 if (rand(4) == 1) {
 	ball.sM++;
-	pong.ntfs.push(ntf({txt:"Speed Increased!",x:ctxWD2,y:ctxH - 100,font:"60px pong",c:"#FFFFFF",baseline:"top",align:"center",count:3,interval:750}));
+	pong.ntfs.push(ntf({txt:"Speed Increased!",x:ctxWD2,y:ctxH - 100,f:"60px pong",c:"#FFFFFF",b:"top",a:"center",cn:3,i:750}));
 }
 }
 
@@ -63,20 +63,20 @@ I.active = true;
 I.render = true;
 I.flashTimer = setInterval(function() {
 	if (!pong.paused) {
-		I.count--;
-		if (I.count%2 == 1) {
+		I.cn--;
+		if (I.cn%2 == 1) {
 			I.render = true;
 		}
 		else {
 			I.render = false;
 		}
-		if (I.count == 0) {
+		if (I.cn == 0) {
 			clearInterval(I.flashTimer);
 			I.render = false;
 			I.active = false;
 		}
 	}
-},I.interval);
+},I.i);
 return I;
 }
 

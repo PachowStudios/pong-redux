@@ -28,6 +28,7 @@ pong = {
 	win: 10,
 	pressedKeys: [],
 	ntfs: [],
+	pwrs: [],
 	debug: true,
 	paused: false,
 	respawning: false,
@@ -51,8 +52,6 @@ pong = {
 		s: 8,
 		sM: 0,
 		c: "#FFFFFF",
-		expanded: false,
-		shrunk: false,
 	},
 	pB: {
 		x: null,
@@ -63,8 +62,6 @@ pong = {
 		s: 8,
 		sM: 0,
 		c: "#FFFFFF",
-		expanded: false,
-		shrunk: false,
 	},
 	sA: {
 		val: 0,
@@ -92,10 +89,10 @@ pong = {
 		h: 10,
 		s: 5,
 		c: "#FFFFFF",
-		active: false,
 		move: false,
 		dir: null,
 		obj: null,
+		rsp: 0;
 	},
 	pAI: {
 		pA: true,
