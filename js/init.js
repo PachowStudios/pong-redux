@@ -24,7 +24,7 @@ KEY = {
 	I: 73
 }
 pong = {
-	ver: "v1.5",
+	ver: "v1.5.1",
 	fps: 60,
 	win: 10,
 	pressedKeys: [],
@@ -96,8 +96,8 @@ pong = {
 		rsp: 0,
 	},
 	pAI: {
-		pA: true,
-		pB: true,
+		pA: false,
+		pB: false,
 	},
 	pAIOpt: {
 		miss: 0,
