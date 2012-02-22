@@ -33,7 +33,7 @@ ctx.clearRect(0,0,ctxW,ctxH)
 //draw ball
 if (render.ball) {
 	ctx.fillStyle = ball.c;
-	ctx.fillRect(ball.x,ball.y,ball.w,ball.h);
+	ctx.fillRect(ball.x,ball.y,ball.w + ball.wM,ball.h + ball.hM);
 }
 //draw pA
 if (render.pA) {
@@ -205,8 +205,8 @@ ball.y += (ball.s + ball.sM) * ball.dirY;
 function checkCollision() {
 //ball
 //left paddle
-if (ball.x <= pA.x + pA.w && ball.x + ball.w >= pA.x) {
-	if (ball.y <= pA.y + pA.h + pA.hM && ball.y + ball.h >= pA.y) {
+if (ball.x <= pA.x + pA.w && ball.x + ball.w + ball.wM >= pA.x) {
+	if (ball.y <= pA.y + pA.h + pA.hM && ball.y + ball.h + ball.hM >= pA.y) {
 		ball.dirX = 1;
 		if (ball.y + (ball.h / 2) <= pA.y + (pA.h * 0.25)){
 			ball.dirY = -1;
@@ -218,8 +218,8 @@ if (ball.x <= pA.x + pA.w && ball.x + ball.w >= pA.x) {
 	}
 }
 //right paddle
-if (ball.x + ball.w >= pB.x && ball.x <= pB.x + pB.w) {
-	if (ball.y <= pB.y + pB.h + pB.hM && ball.y + ball.h >= pB.y) {
+if (ball.x + ball.w + ball.wM >= pB.x && ball.x <= pB.x + pB.w) {
+	if (ball.y <= pB.y + pB.h + pB.hM && ball.y + ball.h + ball.hM >= pB.y) {
 		ball.dirX = -1;
 		if (ball.y + (ball.h / 2) <= pB.y + (pB.h * 0.25)){
 			ball.dirY = -1;

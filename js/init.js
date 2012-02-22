@@ -24,20 +24,22 @@ KEY = {
 	I: 73
 }
 pong = {
-	ver: "v1.5.1",
+	ver: "v1.6beta",
 	fps: 60,
 	win: 10,
 	pressedKeys: [],
 	ntfs: [],
 	pwrs: [],
-	debug: false,
+	debug: true,
 	paused: false,
 	respawning: false,
 	ball: {         
 		x: null,
 		y: null,
 		w: 20,
+		wM: 0,
 		h: 20,
+		hM: 0,
 		s: 5,
 		sM: 0,
 		dirX: 1,
@@ -96,8 +98,8 @@ pong = {
 		rsp: 0,
 	},
 	pAI: {
-		pA: false,
-		pB: false,
+		pA: true,
+		pB: true,
 	},
 	pAIOpt: {
 		miss: 0,
