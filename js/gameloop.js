@@ -76,7 +76,7 @@ if (render.paused) {
 if (render.version) {
 	ctx.font = "20px pong";
 	ctx.textAlign = "right";
-	ctx.fillText("v1.5beta",ctxW - 5,5);
+	ctx.fillText(pong.ver,ctxW - 5,5);
 }
 //draw ntf
 if (render.ntf) {
@@ -126,6 +126,14 @@ else if (pong.pressedKeys[KEY.D].wasDown && pong.debug) {
 	ball.sM += 4.5;
 	pA.sM += 7;
 	pB.sM += 7;
+}
+if (pong.pressedKeys[KEY.I].isDown && !pong.pressedKeys[KEY.I].wasDown) {
+	if (pAI.pA) pAI.pA = false;
+	else pAI.pA = true;
+}
+if (pong.pressedKeys[KEY.O].isDown && !pong.pressedKeys[KEY.O].wasDown) {
+	if (pAI.pB) pAI.pB = false;
+	else pAI.pB = true;
 }
 for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
