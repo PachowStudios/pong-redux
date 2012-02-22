@@ -21,7 +21,8 @@ KEY = {
 	D: 68,
 	P: 80,
 	O: 79,
-	I: 73
+	I: 73,
+	SPACE: 32
 }
 pong = {
 	ver: "v1.6beta",
@@ -136,8 +137,6 @@ pB.x = ctxW - 100 - pB.w;
 sA.x = ctxWD2 - 200;
 sB.x = ctxWD2 + 200;
 cmpt.x = ctxWD2;
-//get the ball rolling (not really)
-respawnBall();
 //initialize key listeners
 for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
@@ -161,6 +160,36 @@ $(document).keyup(function(e) {
 		}
 	}
 });
-//initialize gameloop
-pong.gameloop = setInterval(gameloop,1000/pong.fps);
+
+//initialize startloop
+pong.startloop = setInterval(startloop,1000/pong.fps);
+
+function startloop() {
+if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
+	ctx.canvas.width = window.innerWidth;
+	ctx.canvas.height = window.innerHeight;
+	ctxW = ctx.canvas.width;
+	ctxH = ctx.canvas.height;
+	ctxWD2 = ctxW / 2;
+	ctxHD2 = ctxH / 2;
+}
+ctx.clearRect(0,0,ctxW,ctxH)
+ctx.font = "60px pong";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillStyle = "#FFFFFF";
+ctx.fillText("Press SPACE to Start",ctxW / 2,ctxH / 2);
+if (pong.pressedKeys[KEY.SPACE].isDown && !pong.pressedKeys[KEY.SPACE].wasDown) {
+	//initialize gameloop
+	clearInterval(pong.startloop);
+	//get the ball rolling (not really)
+	respawnBall();
+	pong.gameloop = setInterval(gameloop,1000/pong.fps);
+}
+for (var keyCode in KEY) {
+	if (KEY.hasOwnProperty(keyCode)) {
+		pong.pressedKeys[KEY[keyCode]].wasDown = pong.pressedKeys[KEY[keyCode]].isDown;
+	}
+}
+}
 }
