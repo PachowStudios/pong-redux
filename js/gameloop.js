@@ -66,6 +66,8 @@ if (render.sB) {
 if (render.cmpt) {
 	ctx.fillStyle = cmpt.c;
 	ctx.fillText(cmpt.txt,cmpt.x,cmpt.y);
+	ctx.font = "60px pong";
+	ctx.fillText(cmpt.txt2,cmpt.x, cmpt.y + 400);
 }
 //draw pause screen
 if (render.paused) {
@@ -298,6 +300,18 @@ if (cmpt.val == true) {
 	sB.y = cmpt.y + 150;
 	render.cmpt = true;
 	clearInterval(pong.gameloop);
+	pong.cmptinput = setInterval(function() {
+		if (pong.pressedKeys[KEY.SPACE].isDown && !pong.pressedKeys[KEY.SPACE].wasDown) {
+			play2 = true;
+			init();
+			clearInterval(pong.cmptinput);
+		}
+		for (var keyCode in KEY) {
+			if (KEY.hasOwnProperty(keyCode)) {
+				pong.pressedKeys[KEY[keyCode]].wasDown = pong.pressedKeys[KEY[keyCode]].isDown;
+			}
+		}
+	},1000/pong.fps);
 	renderGraphics();
 }
 }

@@ -2,6 +2,8 @@
 /* vars and init */
 /*****************/
 
+var play2 = false;
+
 function init() {
 //setup canvas
 canvas = document.getElementById("canvas");
@@ -82,6 +84,7 @@ pong = {
 	cmpt: {
 		val: false,
 		txt: null,
+		txt2: "Press SPACE to Play Again",
 		x: null,
 		y: 20,
 		c: "#FFFFFF",
@@ -162,7 +165,14 @@ $(document).keyup(function(e) {
 });
 
 //initialize startloop
-pong.startloop = setInterval(startloop,1000/pong.fps);
+if (!play2) {
+	pong.startloop = setInterval(startloop,1000/pong.fps);
+}
+else if (play2) {
+	respawnBall();
+	pong.gameloop = setInterval(gameloop,1000/pong.fps);
+}
+}
 
 function startloop() {
 if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
@@ -190,6 +200,5 @@ for (var keyCode in KEY) {
 	if (KEY.hasOwnProperty(keyCode)) {
 		pong.pressedKeys[KEY[keyCode]].wasDown = pong.pressedKeys[KEY[keyCode]].isDown;
 	}
-}
 }
 }
