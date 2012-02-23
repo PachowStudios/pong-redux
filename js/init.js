@@ -43,7 +43,7 @@ pong = {
 		wM: 0,
 		h: 20,
 		hM: 0,
-		s: 5,
+		s: null,
 		sM: 0,
 		dirX: 1,
 		dirY: 1,
@@ -107,7 +107,7 @@ pong = {
 	},
 	pAIOpt: {
 		miss: 0,
-		diff: 1000,
+		diff: 1200,
 	},
 	render: {
 		ball: true,
@@ -134,6 +134,7 @@ pAI = pong.pAI;
 pAIOpt = pong.pAIOpt;
 render = pong.render;
 //adjust positioning according to window size
+ball.s = ctxW / 250;
 pA.y = (ctxH - pA.h) / 2;
 pB.y = (ctxH - pB.h) / 2;
 pB.x = ctxW - 100 - pB.w;
@@ -175,14 +176,7 @@ else if (play2) {
 }
 
 function startloop() {
-if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
-	ctx.canvas.width = window.innerWidth;
-	ctx.canvas.height = window.innerHeight;
-	ctxW = ctx.canvas.width;
-	ctxH = ctx.canvas.height;
-	ctxWD2 = ctxW / 2;
-	ctxHD2 = ctxH / 2;
-}
+checkResize();
 ctx.clearRect(0,0,ctxW,ctxH)
 ctx.font = "60px pong";
 ctx.textAlign = "center";

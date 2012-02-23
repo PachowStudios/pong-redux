@@ -15,6 +15,24 @@ var ys = ys * ys;
 return Math.floor(Math.sqrt(xs + ys));
 }
 
+function checkResize() {
+if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
+	ctx.canvas.width = window.innerWidth;
+	ctx.canvas.height = window.innerHeight;
+	ctxW = ctx.canvas.width;
+	ctxH = ctx.canvas.height;
+	ball.s = ctxW / 250;
+	ctxWD2 = ctxW / 2;
+	ctxHD2 = ctxH / 2;
+	pA.y = (ctxH - pA.h) / 2;
+	pB.y = (ctxH - pB.h) / 2;
+	pB.x = ctxW - 100 - pB.w;
+	sA.x = ctxWD2 - 200;
+	sB.x = ctxWD2 + 200;
+	cmpt.x = ctxWD2;
+}
+}
+
 function respawnBall() {
 pong.respawning = true;
 //reset ball coords

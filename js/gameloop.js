@@ -15,19 +15,7 @@ trimArrays();
 
 function renderGraphics() {
 //resize if window size changes
-if (ctxW != window.innerWidth || ctxH != window.innerHeight) {
-	ctx.canvas.width = window.innerWidth;
-	ctx.canvas.height = window.innerHeight;
-	ctxW = ctx.canvas.width;
-	ctxH = ctx.canvas.height;
-	ctxWD2 = ctxW / 2;
-	ctxHD2 = ctxH / 2;
-	pA.y = (ctxH - pA.h) / 2;
-	pB.y = (ctxH - pB.h) / 2;
-	pB.x = ctxW - 100 - pB.w;
-	sA.x = ctxWD2 - 200;
-	sB.x = ctxWD2 + 200;
-}
+checkResize();
 //clear canvas
 ctx.clearRect(0,0,ctxW,ctxH)
 //draw ball
@@ -67,7 +55,7 @@ if (render.cmpt) {
 	ctx.fillStyle = cmpt.c;
 	ctx.fillText(cmpt.txt,cmpt.x,cmpt.y);
 	ctx.font = "60px pong";
-	ctx.fillText(cmpt.txt2,cmpt.x, cmpt.y + 400);
+	ctx.fillText(cmpt.txt2,cmpt.x,ctxH - 100);
 }
 //draw pause screen
 if (render.paused) {
@@ -118,16 +106,16 @@ if (pong.pressedKeys[KEY.P].isDown && !pong.pressedKeys[KEY.P].wasDown) {
 //slow down ball and paddles [DEBUG]
 if (pong.pressedKeys[KEY.D].isDown && pong.debug) {
 	if (!pong.pressedKeys[KEY.D].wasDown) {
-		ball.sM -= 4.5;
-		pA.sM -= 7;
-		pB.sM -= 7;
+		ball.sM -= ball.s - 0.5;
+		pA.sM -= pA.s - 0.5;
+		pB.sM -= pB.s - 0.5;
 	}
 } 
 //return ball and paddles to normal speed [DEBUG]
 else if (pong.pressedKeys[KEY.D].wasDown && pong.debug) {
-	ball.sM += 4.5;
-	pA.sM += 7;
-	pB.sM += 7;
+	ball.sM += ball.s - 0.5;
+	pA.sM += pA.s - 0.5;
+	pB.sM += pB.s - 0.5;
 }
 if (pong.pressedKeys[KEY.I].isDown && !pong.pressedKeys[KEY.I].wasDown) {
 	if (pAI.pA) pAI.pA = false;
@@ -311,6 +299,7 @@ if (cmpt.val == true) {
 				pong.pressedKeys[KEY[keyCode]].wasDown = pong.pressedKeys[KEY[keyCode]].isDown;
 			}
 		}
+		renderGraphics();
 	},1000/pong.fps);
 	renderGraphics();
 }
